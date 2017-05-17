@@ -7,8 +7,12 @@
 //
 
 #import "touivewViewController.h"
+#import <ReactiveCocoa/ReactiveCocoa.h>
 
 @interface touivewViewController ()
+{
+    CGFloat r,g,b;
+}
 @property (weak, nonatomic) IBOutlet UISlider *redSlider;
 @property (weak, nonatomic) IBOutlet UISlider *blueSlider;
 @property (weak, nonatomic) IBOutlet UISlider *greenSlider;
@@ -19,26 +23,41 @@
 
 @end
 
+
+
 @implementation touivewViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+
+    _redtext.text = _bluetext.text = _greentext.text = @"0.5";
+    
+    [self bindingControlWithSlider:_redSlider text:_redtext];
+    [self bindingControlWithSlider:_blueSlider text:_bluetext];
+    [self bindingControlWithSlider:_greenSlider text:_greentext];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+
+/**
+ *  双向绑定滑块和输入值
+ *
+ *  @param slider 滑块
+ *  @param text   textfiled
+ */
+-(void)bindingControlWithSlider:(UISlider *)slider text:(UITextField *)text
+{
+    RACChannelTerminal *signalSlider = [slider rac_newValueChannelWithNilValue:nil];
+    RACChannelTerminal *textSlider = [text rac_newTextChannel];
+    
+    [[signalSlider map:^id(id value) {
+        return  [NSString stringWithFormat:@"%.02f",[value floatValue]];
+    }] subscribe:textSlider];
+    
+    [textSlider subscribe:signalSlider];
+    
+    
 }
 
-/*
-#pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

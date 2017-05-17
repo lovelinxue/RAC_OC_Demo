@@ -43,13 +43,13 @@
 //    }];
   
   [self.login setRac_command:[[RACCommand alloc] initWithEnabled:btnEnableSignal signalBlock:^RACSignal *(id input) {
-//      return [RACSignal empty];
+      return [RACSignal empty];
       
-      return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-          
-//          [textCombinSignal rac_]
-          
-      }]
+//      return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+//          
+////          [textCombinSignal rac_]
+//          
+//      }];
       
   }]];
    

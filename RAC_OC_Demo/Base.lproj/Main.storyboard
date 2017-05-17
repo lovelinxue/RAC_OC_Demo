@@ -38,6 +38,13 @@
                                 <rect key="frame" x="184" y="340" width="46" height="30"/>
                                 <state key="normal" title="登陆"/>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ti2-yN-ehQ">
+                                <rect key="frame" x="184" y="378" width="46" height="30"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <segue destination="qwh-wR-eg5" kind="show" id="LI2-Yv-Ac4"/>
+                                </connections>
+                            </button>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="7Gy-Gw-aVU">
                                 <rect key="frame" x="83" y="265" width="311" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -46,6 +53,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
+                    <navigationItem key="navigationItem" id="Kqr-TJ-ja1"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina55"/>
                     <connections>
                         <outlet property="login" destination="Sz9-u2-EJR" id="qg5-mH-xZM"/>
@@ -97,9 +105,14 @@
                                 <rect key="frame" x="20" y="304" width="374" height="211"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rei-Pl-UKX">
+                                <rect key="frame" x="165" y="68" width="46" height="30"/>
+                                <state key="normal" title="Button"/>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
+                    <navigationItem key="navigationItem" id="GeQ-eG-HIK"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina55"/>
                     <connections>
                         <outlet property="bgView" destination="TwS-mS-QDR" id="EkF-Nb-ncZ"/>
