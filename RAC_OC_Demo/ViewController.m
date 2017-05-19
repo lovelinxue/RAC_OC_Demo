@@ -33,27 +33,45 @@
     RACSignal *textCombinSignal = [RACSignal combineLatest:@[userSignal,psdSignal]];
     
 
-    //判断text数据
+    //判断text数据来返回按钮是否可点
     RACSignal *btnEnableSignal = [textCombinSignal map:^id(id value) {
         return @([value[0] length] > 0 && [value[1] length] > 6);
     }];
+
+    
+    
     
 //    RACSignal *enableBtn = [[RACSignal combineLatest:@[self.user.rac_textSignal,self.psd.rac_textSignal]]map:^id(id value) {
 //        return @([value[0] length] > 0 && [value[1] length] > 6);
 //    }];
   
+
+    //给登陆按钮添加事件
   [self.login setRac_command:[[RACCommand alloc] initWithEnabled:btnEnableSignal signalBlock:^RACSignal *(id input) {
-      return [RACSignal empty];
       
-//      return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-//          
-////          [textCombinSignal rac_]
-//          
-//      }];
+      return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+          
+          [textCombinSignal subscribeNext:^(id x) {
+              [subscriber sendNext:x];
+              [subscriber sendCompleted];
+          }];
+          
+          //释放
+          return [RACDisposable disposableWithBlock:^{
+              
+          }];
+      }];
       
   }]];
    
 
+    //调用点击事件
+    [[[self.login rac_command] executionSignals]subscribeNext:^(id x) {
+        [x subscribeNext:^(id x) {
+            NSLog(@"--------账号:%@---------密码:%@",x[0],x[1]);
+        }];
+    }];
+    
 }
 
 

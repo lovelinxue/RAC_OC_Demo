@@ -30,11 +30,37 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    //赋个初始值
     _redtext.text = _bluetext.text = _greentext.text = @"0.5";
     
-    [self bindingControlWithSlider:_redSlider text:_redtext];
-    [self bindingControlWithSlider:_blueSlider text:_bluetext];
-    [self bindingControlWithSlider:_greenSlider text:_greentext];
+    //将2个控件绑定后值的结果用信号接收
+    RACSignal *redS = [self bindingControlWithSlider:_redSlider text:_redtext];
+    RACSignal *blueS = [self bindingControlWithSlider:_blueSlider text:_bluetext];
+    RACSignal *greenS = [self bindingControlWithSlider:_greenSlider text:_greentext];
+    
+    RACSignal *rgb = [[RACSignal combineLatest:@[redS,greenS,blueS]]map:^id(RACTuple *value) {
+        return [UIColor colorWithRed:[value[0]floatValue] green:[value[2]floatValue] blue:[value[1]floatValue] alpha:1];
+    }];
+    
+    [rgb subscribeNext:^(id x) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            _bgView.backgroundColor = x;
+        });
+    }];
+    
+//    //1.首先合并3个信号量   2.然后用map修改信号量为需要的值  3.直接订阅这个信号量的返回值
+//    [[[RACSignal combineLatest:@[redS,blueS,greenS]]map:^id(RACTuple *value) {
+//        return [UIColor colorWithRed:[value[0] floatValue] green:[value[2]floatValue] blue:[value[1]floatValue] alpha:1];
+//    }] subscribeNext:^(id x) {
+//        
+//        //刷新UI的方法尽量放到主线程里,尽量避免一些不必要的Bug
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            _bgView.backgroundColor = x;
+//        });
+//        
+//    }];
+    
+
 }
 
 
@@ -44,8 +70,11 @@
  *  @param slider 滑块
  *  @param text   textfiled
  */
--(void)bindingControlWithSlider:(UISlider *)slider text:(UITextField *)text
+-(RACSignal *)bindingControlWithSlider:(UISlider *)slider text:(UITextField *)text
 {
+    
+    RACSignal *textS = [[text rac_textSignal] take:1];
+    
     RACChannelTerminal *signalSlider = [slider rac_newValueChannelWithNilValue:nil];
     RACChannelTerminal *textSlider = [text rac_newTextChannel];
     
@@ -55,6 +84,8 @@
     
     [textSlider subscribe:signalSlider];
     
+    
+    return [RACSignal merge:@[textSlider,signalSlider,textS]];
     
 }
 
