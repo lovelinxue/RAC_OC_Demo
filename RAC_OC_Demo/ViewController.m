@@ -24,52 +24,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-
-    //创建text信号
-    RACSignal *userSignal = self.user.rac_textSignal;
-    RACSignal *psdSignal = self.psd.rac_textSignal;
+    //定义错误
+    NSError *error;
+    NSURL *ipURL = [NSURL URLWithString:@"http://ipof.in/txt"];
+    NSString *ip = [NSString stringWithContentsOfURL:ipURL encoding:NSUTF8StringEncoding error:&error];
     
-    //合并2个信号
-    RACSignal *textCombinSignal = [RACSignal combineLatest:@[userSignal,psdSignal]];
-    
-
-    //判断text数据来返回按钮是否可点
-    RACSignal *btnEnableSignal = [textCombinSignal map:^id(id value) {
-        return @([value[0] length] > 0 && [value[1] length] > 6);
-    }];
-
-    
-    
-    
-//    RACSignal *enableBtn = [[RACSignal combineLatest:@[self.user.rac_textSignal,self.psd.rac_textSignal]]map:^id(id value) {
-//        return @([value[0] length] > 0 && [value[1] length] > 6);
-//    }];
-  
-
-    //给登陆按钮添加事件
-  [self.login setRac_command:[[RACCommand alloc] initWithEnabled:btnEnableSignal signalBlock:^RACSignal *(id input) {
-      
-      return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-          
-          [textCombinSignal subscribeNext:^(id x) {
-              [subscriber sendNext:x];
-              [subscriber sendCompleted];
-          }];
-          
-          //释放
-          return [RACDisposable disposableWithBlock:^{
-              
-          }];
-      }];
-      
-  }]];
-   
-
-    //调用点击事件
-    [[[self.login rac_command] executionSignals]subscribeNext:^(id x) {
-        [x subscribeNext:^(id x) {
-            NSLog(@"--------账号:%@---------密码:%@",x[0],x[1]);
-        }];
+    [[self signalForJson:[NSString stringWithFormat:@"http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=%@",ip]] subscribeNext:^(id x) {
+        
+        NSLog(@"\n您的外网IP号为:%@\n您的IP地址为:%@-%@-%@",ip,x[@"country"],x[@"province"],x[@"city"]);
+        
     }];
     
 }
@@ -78,7 +41,52 @@
 
 
 
+- (RACSignal *)signalForJson:(NSString *)url
+{
+    //实例化一个信号
+    return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+        
+        //先实例化
+        NSURLSessionConfiguration *c = [NSURLSessionConfiguration defaultSessionConfiguration];
+        //
+        NSURLSession *sess = [NSURLSession sessionWithConfiguration:c];
 
+        //创建一个数据流
+        NSURLSessionDataTask *data = [sess dataTaskWithURL:[NSURL URLWithString:url] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+            
+            //先判断是否有错误,有错误就传错误
+            if (error){
+                [subscriber sendError:error];
+            }else{
+                
+                NSError *err;//用来记录错误值
+                
+                //使用系统的json解析
+                NSDictionary *jsonDic = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
+                
+                //json解析是否有错误
+                if(err){
+                    [subscriber sendError:err];
+                }else{
+                    [subscriber sendNext:jsonDic];
+                    [subscriber sendCompleted];
+                }
+                
+            }
+            
+        }];
+        [data resume];
+        
+        //释放之后要执行的,必须写
+        return [RACDisposable disposableWithBlock:^{
+            
+        }];
+        
+    }];
+    
+    
+    
+}
 
 
 
@@ -112,7 +120,59 @@
 
 
 
+/**
+ *  text绑定按钮状态
+ */
+- (void)RACTextButtonBinding{
 
+    //创建text信号
+    RACSignal *userSignal = self.user.rac_textSignal;
+    RACSignal *psdSignal = self.psd.rac_textSignal;
+    
+    //合并2个信号
+    RACSignal *textCombinSignal = [RACSignal combineLatest:@[userSignal,psdSignal]];
+    
+    
+    //判断text数据来返回按钮是否可点
+    RACSignal *btnEnableSignal = [textCombinSignal map:^id(id value) {
+        return @([value[0] length] > 0 && [value[1] length] > 6);
+    }];
+    
+    
+    
+    
+    //    RACSignal *enableBtn = [[RACSignal combineLatest:@[self.user.rac_textSignal,self.psd.rac_textSignal]]map:^id(id value) {
+    //        return @([value[0] length] > 0 && [value[1] length] > 6);
+    //    }];
+    
+    
+    //给登陆按钮添加事件
+    [self.login setRac_command:[[RACCommand alloc] initWithEnabled:btnEnableSignal signalBlock:^RACSignal *(id input) {
+        
+        return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+            
+            [textCombinSignal subscribeNext:^(id x) {
+                [subscriber sendNext:x];
+                [subscriber sendCompleted];
+            }];
+            
+            //释放
+            return [RACDisposable disposableWithBlock:^{
+                
+            }];
+        }];
+        
+    }]];
+    
+    
+    //调用点击事件
+    [[[self.login rac_command] executionSignals]subscribeNext:^(id x) {
+        [x subscribeNext:^(id x) {
+            NSLog(@"--------账号:%@---------密码:%@",x[0],x[1]);
+        }];
+    }];
+
+}
 
 
 

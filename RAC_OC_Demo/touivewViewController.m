@@ -42,11 +42,17 @@
         return [UIColor colorWithRed:[value[0]floatValue] green:[value[2]floatValue] blue:[value[1]floatValue] alpha:1];
     }];
     
-    [rgb subscribeNext:^(id x) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            _bgView.backgroundColor = x;
-        });
-    }];
+//    [rgb subscribeNext:^(id x) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            _bgView.backgroundColor = x;
+//        });
+//    }];
+    
+    //以上代码可以直接简单这样写 RAC(__这里是要改变的对象__,__这里是对象要改变的属性__) = 改变的值
+    RAC(_bgView,backgroundColor) = rgb;
+
+    
+    
     
 //    //1.首先合并3个信号量   2.然后用map修改信号量为需要的值  3.直接订阅这个信号量的返回值
 //    [[[RACSignal combineLatest:@[redS,blueS,greenS]]map:^id(RACTuple *value) {
@@ -90,5 +96,8 @@
 }
 
 
+- (IBAction)dismiss:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 
 @end
