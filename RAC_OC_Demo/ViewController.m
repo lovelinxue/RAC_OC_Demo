@@ -24,17 +24,76 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    //定义错误
-    NSError *error;
-    NSURL *ipURL = [NSURL URLWithString:@"http://ipof.in/txt"];
-    NSString *ip = [NSString stringWithContentsOfURL:ipURL encoding:NSUTF8StringEncoding error:&error];
     
-    [[self signalForJson:[NSString stringWithFormat:@"http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=%@",ip]] subscribeNext:^(id x) {
-        
-        NSLog(@"\n您的外网IP号为:%@\n您的IP地址为:%@-%@-%@",ip,x[@"country"],x[@"province"],x[@"city"]);
-        
+    RACSignal *t1 = [_user rac_textSignal];
+    RACSignal *t2 = [_psd rac_textSignal];
+    
+//    [[RACSignal merge:@[t1,t2]] subscribeNext:^(id x) {
+//        NSLog(@"-----------%@----------",x);
+//    }];
+//    
+    
+    [[RACSignal combineLatest:@[t1,t2]] subscribeNext:^(id x) {
+        NSLog(@"*********%@**********",x);
     }];
     
+    
+    
+    
+//    //定义错误
+//    NSError *error;
+//    
+//    NSURL *ipURL = [NSURL URLWithString:@"http://ipof.in/txt"];
+//    
+//    NSString *ip = [NSString stringWithContentsOfURL:ipURL encoding:NSUTF8StringEncoding error:&error];
+//    
+//    NSString *ipStr = [NSString stringWithFormat:@"http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=%@",ip];
+    
+//    [[self signalForJson:ipStr] subscribeNext:^(id x) {
+//        
+//        NSLog(@"\n您的外网IP号为:%@\n您的IP地址为:%@-%@-%@",ip,x[@"country"],x[@"province"],x[@"city"]);
+//        
+//    }error:^(NSError *error) {
+//        
+//        NSLog(@"错误状态------%@",error);
+//        
+//    }completed:^{
+//        
+//        NSLog(@"完成之后状态------需要释放的东西");
+//        
+//    }];
+    
+    
+    
+//    RACSignal *s = [self signalForJson:ipStr];
+//    RACSignal *s1 = [self signalForJson:ipStr];
+//    RACSignal *s2 = [self signalForJson:ipStr];
+//    
+//    
+//    //类似于GCD中的同步并行,等都执行完毕在执行结果
+//    [[RACSignal combineLatest:@[s,s1,s2]] subscribeNext:^(id x) {
+//        //等3个都执行完毕再执行结果
+//    }];
+//    
+//    
+//    //依次执行
+//    [[[s then:^RACSignal *{
+//        return s1;
+//    }] then:^RACSignal *{
+//        return s2;
+//    }] subscribeNext:^(id x) {
+//        //s执行之后会执行s1执行之后会返回s2来执行,之后会执行结果
+//    }];
+//    
+//    
+//    //
+//    [[RACSignal merge:@[s,s1,s2]] subscribeNext:^(id x) {
+//        //执行结果
+//    }];
+    
+    
+
+
 }
 
 
